@@ -14,86 +14,97 @@
 # end = time.perf_counter() 
 
 # print(f"Time of run:{end-start:.6f} seconds")
-import random
-import statistics
 import time
+import random
+import statistics as stats
 
+# -----------------------------
+# Configuration
+# -----------------------------
+
+SEED = 12345
+random.seed(SEED)
 
 VECTOR_SIZES = [10, 50, 100, 200, 500]
 MATRIX_SIZES = [10, 50, 100, 200, 500]
-TRIALS = 10
-SEED = 42
+TRIALS = 15
 
 
-def make_vector(size: int, rng: random.Random) -> list[float]:
-    return [rng.random() for _ in range(size)]
+# -----------------------------
+# Vector element-wise multiply
+# -----------------------------
 
-
-def make_matrix(size: int, rng: random.Random) -> list[list[float]]:
-    return [[rng.random() for _ in range(size)] for _ in range(size)]
-
-#Element-wise vector multiplication using pure Python (O(n)).
-def vector_mul_python(a: list[float], b: list[float]) -> list[float]:
-    if len(a) != len(b):
-        raise ValueError("Vectors must have the same length.")
-
-    out = [0.0] * len(a)
-    for i in range(len(a)):
-        out[i] = a[i] * b[i]
-    return out
-
-#Matrix multiplication using pure Python (O(n^3)).
-def matmul_python(a: list[list[float]], b: list[list[float]]) -> list[list[float]]:
+def py_vector_multiply(a, b):
     n = len(a)
-    if n == 0 or len(b) != n or any(len(row) != n for row in a) or any(len(row) != n for row in b):
-        raise ValueError("Both matrices must be non-empty and square with the same dimensions.")
-
-    result = [[0.0 for _ in range(n)] for _ in range(n)]
+    result = [0.0] * n
     for i in range(n):
-        for k in range(n):
-            aik = a[i][k]
-            for j in range(n):
-                result[i][j] += aik * b[k][j]
+        result[i] = a[i] * b[i]
     return result
 
 
-def median_time(fn, trials: int = TRIALS) -> float:
-    # Warm-up run (not measured).
-    fn()
+# -----------------------------
+# True matrix multiplication
+# -----------------------------
 
-    samples = []
+def py_matrix_multiply(A, B):
+    n = len(A)
+    C = [[0.0] * n for _ in range(n)]
+
+    for i in range(n):
+        Ai = A[i]
+        Ci = C[i]
+        for k in range(n):
+            aik = Ai[k]
+            Bk = B[k]
+            for j in range(n):
+                Ci[j] += aik * Bk[j]
+
+    return C
+
+
+# -----------------------------
+# Timing helper
+# -----------------------------
+
+def median_time(function, trials=TRIALS, warmup=True):
+    if warmup:
+        function()
+
+    times = []
     for _ in range(trials):
         start = time.perf_counter()
-        fn()
+        function()
         end = time.perf_counter()
-        samples.append(end - start)
-    return statistics.median(samples)
+        times.append(end - start)
+
+    return stats.median(times)
 
 
-def run_vector_benchmark() -> None:
-    print("Pure Python vector element-wise multiplication (median seconds)")
-    print("size,time_s")
-    for size in VECTOR_SIZES:
-        rng = random.Random(SEED + size)
-        a = make_vector(size, rng)
-        b = make_vector(size, rng)
-        t = median_time(lambda: vector_mul_python(a, b))
-        print(f"{size},{t:.8f}")
-    print()
+# =============================
+# VECTOR BENCHMARK
+# =============================
+
+print("\n--- VECTOR ELEMENT-WISE MULTIPLICATION ---")
+
+for n in VECTOR_SIZES:
+    a = [random.random() for _ in range(n)]
+    b = [random.random() for _ in range(n)]
+
+    t = median_time(lambda: py_vector_multiply(a, b), TRIALS)
+    print(f"Size {n:4d} -> Median Time: {t:.6f} seconds")
 
 
-def run_matrix_benchmark() -> None:
-    print("Pure Python matrix multiplication (median seconds)")
-    print("size,time_s")
-    for size in MATRIX_SIZES:
-        rng = random.Random(SEED + 1000 + size)
-        a = make_matrix(size, rng)
-        b = make_matrix(size, rng)
-        t = median_time(lambda: matmul_python(a, b))
-        print(f"{size},{t:.8f}")
-    print()
+# =============================
+# MATRIX BENCHMARK
+# =============================
 
+print("\n--- MATRIX MULTIPLICATION ---")
 
-if __name__ == "__main__":
-    run_vector_benchmark()
-    run_matrix_benchmark()
+for n in MATRIX_SIZES:
+    print(f"\nRunning {n}x{n}...")
+
+    A = [[random.random() for _ in range(n)] for _ in range(n)]
+    B = [[random.random() for _ in range(n)] for _ in range(n)]
+
+    t = median_time(lambda: py_matrix_multiply(A, B), TRIALS)
+    print(f"Size {n:4d}x{n:4d} -> Median Time: {t:.6f} seconds")
