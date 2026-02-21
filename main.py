@@ -1,20 +1,20 @@
-"""import time 
-import random
+#import time 
+#import random
 # multiplicacion de 500 elementos. Se supone que no le añada al tiempo 
 
-first_array = [random.randint(1, 1000) for _ in range(500)]
-second_array = [random.randint(1,1000) for _ in range(500)]
+#first_array = [random.randint(1, 1000) for _ in range(500)]
+#second_array = [random.randint(1,1000) for _ in range(500)]
 
-start = time.perf_counter()
+#start = time.perf_counter()
 
-for i in range(500):
-    for j in range(500):
-        print(first_array[i] * second_array[j])
+#for i in range(500):
+ #   for j in range(500):
+  #      print(first_array[i] * second_array[j])
         
-end = time.perf_counter() 
+#end = time.perf_counter() 
 
 
-print(f"Time of run:{end-start:.6f} seconds")"""
+#print(f"Time of run:{end-start:.6f} seconds")
 import random
 import statistics
 import time
@@ -33,7 +33,7 @@ def make_vector(size: int, rng: random.Random) -> list[float]:
 def make_matrix(size: int, rng: random.Random) -> list[list[float]]:
     return [[rng.random() for _ in range(size)] for _ in range(size)]
 
-"Element-wise vector multiplication using pure Python (O(n))."
+#Element-wise vector multiplication using pure Python (O(n)).
 def vector_mul_python(a: list[float], b: list[float]) -> list[float]:
     if len(a) != len(b):
         raise ValueError("Vectors must have the same length.")
@@ -43,7 +43,7 @@ def vector_mul_python(a: list[float], b: list[float]) -> list[float]:
         out[i] = a[i] * b[i]
     return out
 
-'Matrix multiplication using pure Python (O(n^3)).'
+#Matrix multiplication using pure Python (O(n^3)).
 def matmul_python(a: list[list[float]], b: list[list[float]]) -> list[list[float]]:
     n = len(a)
     if n == 0 or len(b) != n or any(len(row) != n for row in a) or any(len(row) != n for row in b):
