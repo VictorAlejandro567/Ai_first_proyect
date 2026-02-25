@@ -190,3 +190,16 @@ plt.ylabel("Speedup = T_python / T_numpy")
 plt.title("Speedup of NumPy over Pure Python")
 plt.grid(True, which="both")
 plt.show()
+
+
+
+plt.figure()
+plt.plot(df_vec["n"], df_vec["t_python_s"], marker="o", label="Pure Python")
+plt.plot(df_vec["n"], df_vec["t_numpy_s"], marker="o", label="NumPy")
+plt.xlabel("Vector Length (n)")
+plt.ylabel("Median Runtime (seconds)")
+plt.title("Vector Element-wise Multiplication Runtime vs Size")
+plt.yscale("log")
+plt.grid(True, which="both")
+plt.legend()
+plt.show()
